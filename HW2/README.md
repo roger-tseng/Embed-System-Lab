@@ -9,7 +9,7 @@ We visualize the received data using the ```mplot3d``` toolkit in ```matplotlib`
 2. Replace the ```main.cpp``` file under the ```source``` directory with the file of the same name here.
 3. Change the library used for ```printf``` in ```./mbed-os/targets/targets.json``` folder by changing ```printf-lib``` from ```minimal-printf``` to ```std```.
 4. Replace the Wi-Fi SSID and password in ```./mbed_app.json```, and connect your computer to the same network.
-5. Use the ```ipconfig``` command in terminal to determine the current IP address of your computer. Change the address in line 89 of ```main.cpp``` and line 9 of ```Lab2.py``` to your IP address.
-6. Run ```Lab2.py```. If the program successfully connects to the port at the given address, a message is printed to show that the program is listening.
+5. Use the ```ipconfig``` command in terminal to determine the current IP address of your computer. Change the address in line 89 of ```main.cpp``` and line 9 of ```HW2.py``` to your IP address.
+6. Run ```HW2.py```. If the program successfully connects to the port at the given address, a message is printed to show that the program is listening.
 7. Build and run ```main.cpp```.
 
