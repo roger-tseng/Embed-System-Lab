@@ -2,14 +2,11 @@ from bluepy.btle import Peripheral, UUID
 from bluepy.btle import Scanner, DefaultDelegate
 import time
 
-class ScanDelegate(DefaultDelegate):
+class NotificationDelegate(DefaultDelegate):
     def __init__(self):
         DefaultDelegate.__init__(self)
-    def handleDiscovery(self, dev, isNewDev, isNewData):
-        if isNewDev:
-            print("Discovered device", dev.addr)
-        elif isNewData:
-            print("Received new data from", dev.addr)
+    def handleNotification(self, cHandle, data):
+        print(f"Received {int.from_bytes(data, 'big')} from characteristic with handle {cHandle}")
 
 scanner = Scanner()
 print("Scanning for 5 seconds...")
@@ -26,6 +23,7 @@ number = int(input('Enter your device number: '))
 print(f'Connecting to #{number}: {devices[number].addr}')
 
 dev = Peripheral(devices[number].addr, devices[number].addrType)
+dev.setDelegate(NotificationDelegate())
 
 print()
 print("Available Services:")
@@ -41,13 +39,19 @@ try:
         print(str(ch))
     target_char = int("0x"+str(input("Which characteristic to connect? ")), 16)
     ch = dev.getCharacteristics(uuid=UUID(target_char))[0]
+    print()
+    print("Handle of selected char is:", ch.valHandle)
+    dev.writeCharacteristic(ch.valHandle+1, b"\x01\x00") # this line enables notifications
     
     print()
     if target_svc == 0xa000:
+        print("Start wait for notifications...")
         while True:
             if (ch.supportsRead()):
-                print("Data in channel:", ch.read())
-                time.sleep(0.5)
+                if dev.waitForNotifications(100.0):
+                    continue
+                else:
+                    print("No notifications received in the last 100s...")
     elif target_svc == 0xa002:
         if (ch.supportsRead()):
             print("Data in channel:", ch.read())
@@ -55,6 +59,5 @@ try:
             message = input("To Write:")
             ch.write(message.encode('utf-8'))
             print(message.encode('utf-8'))
-
 finally:
     dev.disconnect()
